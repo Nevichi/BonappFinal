@@ -27,12 +27,19 @@ namespace BonApp.Data
 
         public async Task<List<Recipe>> GetAllRecipes()
         {
-            HttpResponseMessage response = await client.GetAsync("api/recipes");
             var recipes = new List<Recipe>();
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string json = await response.Content.ReadAsStringAsync();
-                recipes = JsonConvert.DeserializeObject<List<Recipe>>(json);
+                HttpResponseMessage response = await client.GetAsync("api/recipes");
+                
+                if (response.IsSuccessStatusCode)
+                {
+                    string json = await response.Content.ReadAsStringAsync();
+                    recipes = JsonConvert.DeserializeObject<List<Recipe>>(json);
+                }
+            }
+            catch (HttpRequestException e) {
+                return recipes;
             }
             return recipes;
         }
@@ -41,53 +48,75 @@ namespace BonApp.Data
         {
             var recipes = new List<Recipe>();
             var user = new User();
-            HttpResponseMessage response = await client.GetAsync("api/users/" + currentApp.GlobalInstance.userId);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string jsonUser = await response.Content.ReadAsStringAsync();
-                user = JsonConvert.DeserializeObject<User>(jsonUser);
-                foreach (var item in user.userfavorites)
+                HttpResponseMessage response = await client.GetAsync("api/users/" + currentApp.GlobalInstance.userId);
+                if (response.IsSuccessStatusCode)
                 {
-                    String idrecipe = item.recipeid_fav;
-                    HttpResponseMessage responseRecipe = await client.GetAsync("api/recipes/" + idrecipe);
-                    if (responseRecipe.IsSuccessStatusCode)
+                    string jsonUser = await response.Content.ReadAsStringAsync();
+                    user = JsonConvert.DeserializeObject<User>(jsonUser);
+                    foreach (var item in user.userfavorites)
                     {
-                        string jsonRecipe = await responseRecipe.Content.ReadAsStringAsync();
-                        recipes.Add(JsonConvert.DeserializeObject<Recipe>(jsonRecipe));
+                        String idrecipe = item.recipeid_fav;
+                        HttpResponseMessage responseRecipe = await client.GetAsync("api/recipes/" + idrecipe);
+                        if (responseRecipe.IsSuccessStatusCode)
+                        {
+                            string jsonRecipe = await responseRecipe.Content.ReadAsStringAsync();
+                            recipes.Add(JsonConvert.DeserializeObject<Recipe>(jsonRecipe));
+                        }
                     }
                 }
             }
+            catch (HttpRequestException e)
+            {
+                return recipes;
+            }
+            
             return recipes;
         }
 
         public async Task<bool> AddToFavorite(Recipe r)
         {
-            string json = JsonConvert.SerializeObject(r);
-            HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
-            HttpResponseMessage response = await client.PostAsync("api/recipes", content);
-            if ((response.IsSuccessStatusCode) || (response.StatusCode.ToString().Equals("Conflict")))
+            try
             {
-                String recipeId = r.recipe_id + currentApp.GlobalInstance.userId;
-                UserFavorite uFav = new UserFavorite(recipeId, currentApp.GlobalInstance.userId, r.recipe_id);
-                string jsonfav = JsonConvert.SerializeObject(uFav);
-                HttpContent contentfav = new StringContent(jsonfav, Encoding.UTF8, "application/json");
-                HttpResponseMessage responsefav = await client.PostAsync("api/userfavorites", contentfav);
-                if (responsefav.IsSuccessStatusCode)
+                string json = JsonConvert.SerializeObject(r);
+                HttpContent content = new StringContent(json, Encoding.UTF8, "application/json");
+                HttpResponseMessage response = await client.PostAsync("api/recipes", content);
+                if ((response.IsSuccessStatusCode) || (response.StatusCode.ToString().Equals("Conflict")))
                 {
-                    return true;
+                    String recipeId = r.recipe_id + currentApp.GlobalInstance.userId;
+                    UserFavorite uFav = new UserFavorite(recipeId, currentApp.GlobalInstance.userId, r.recipe_id);
+                    string jsonfav = JsonConvert.SerializeObject(uFav);
+                    HttpContent contentfav = new StringContent(jsonfav, Encoding.UTF8, "application/json");
+                    HttpResponseMessage responsefav = await client.PostAsync("api/userfavorites", contentfav);
+                    if (responsefav.IsSuccessStatusCode)
+                    {
+                        return true;
+                    }
+                    return false;
                 }
+            }
+            catch (HttpRequestException e) {
                 return false;
             }
+
             return false;
         }
 
         public async Task<bool> RemoveFavorite(Recipe r)
         {
-            HttpResponseMessage response = await client.DeleteAsync("api/userfavorites/" + r.recipe_id + currentApp.GlobalInstance.userId);
-            if (response.IsSuccessStatusCode)
+            try
             {
-                return true;
+                HttpResponseMessage response = await client.DeleteAsync("api/userfavorites/" + r.recipe_id + currentApp.GlobalInstance.userId);
+                if (response.IsSuccessStatusCode)
+                {
+                    return true;
+                }
             }
+            catch (HttpRequestException e) {
+                return false;
+            }
+
             return false;
         }
 
@@ -95,23 +124,31 @@ namespace BonApp.Data
         public async Task<String> FindUser(String user, String password)
         {
             var users = new List<User>();
-            HttpResponseMessage response = await client.GetAsync("api/users");
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string json = await response.Content.ReadAsStringAsync();
-                users = JsonConvert.DeserializeObject<List<User>>(json);
-                foreach (var item in users)
+                HttpResponseMessage response = await client.GetAsync("api/users");
+                if (response.IsSuccessStatusCode)
                 {
-                    if (item.username.Equals(user) && item.password.Equals(password))
+                    string json = await response.Content.ReadAsStringAsync();
+                    users = JsonConvert.DeserializeObject<List<User>>(json);
+                    foreach (var item in users)
                     {
-                        currentApp.GlobalInstance.userId = item.userid;
-                        Windows.Storage.ApplicationDataContainer localSetting = Windows.Storage.ApplicationData.Current.LocalSettings;
-                        localSetting.Values["userid"] = item.userid;
-                        return "success";
+                        if (item.username.Equals(user) && item.password.Equals(password))
+                        {
+                            currentApp.GlobalInstance.userId = item.userid;
+                            Windows.Storage.ApplicationDataContainer localSetting = Windows.Storage.ApplicationData.Current.LocalSettings;
+                            localSetting.Values["userid"] = item.userid;
+                            return "success";
+                        }
                     }
                 }
+                return "errorLogin";
             }
-            return "errorLogin";
+            catch (HttpRequestException e)
+            {
+                return "noInternet";
+            }
+
         }
 
 
@@ -120,29 +157,36 @@ namespace BonApp.Data
             var userToCreate = new User();
             userToCreate.username = user;
             var users = new List<User>();
-            HttpResponseMessage response = await client.GetAsync("api/users");
-            if (response.IsSuccessStatusCode)
+            try
             {
-                string json = await response.Content.ReadAsStringAsync();
-                users = JsonConvert.DeserializeObject<List<User>>(json);
-                foreach (var item in users)
+                HttpResponseMessage response = await client.GetAsync("api/users");
+                if (response.IsSuccessStatusCode)
                 {
-                    if (item.username.Equals(user))
+                    string json = await response.Content.ReadAsStringAsync();
+                    users = JsonConvert.DeserializeObject<List<User>>(json);
+                    foreach (var item in users)
                     {
-                        return "errorSub";
+                        if (item.username.Equals(user))
+                        {
+                            return "errorSub";
+                        }
                     }
                 }
+                userToCreate.password = password;
+                userToCreate.userfavorites = new List<UserFavorite>();
+                string jsonUser = JsonConvert.SerializeObject(userToCreate);
+                HttpContent content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
+                HttpResponseMessage responseCreate = await client.PostAsync("api/users", content);
+                if (responseCreate.StatusCode.ToString().Equals("Conflict"))
+                {
+                    return "errorSub";
+                }
+                return "success";
             }
-            userToCreate.password = password;
-            userToCreate.userfavorites = new List<UserFavorite>();
-            string jsonUser = JsonConvert.SerializeObject(userToCreate);
-            HttpContent content = new StringContent(jsonUser, Encoding.UTF8, "application/json");
-            HttpResponseMessage responseCreate = await client.PostAsync("api/users", content);
-            if (responseCreate.StatusCode.ToString().Equals("Conflict"))
-            {
-                return "errorSub";
+            catch (HttpRequestException e) {
+                return "noInternet";
             }
-            return "success";
+
         }
     }
 }

@@ -177,4 +177,10 @@
   <data name="recipeRemoved" xml:space="preserve">
     <value>Recipe removed from favorites</value>
   </data>
+  <data name="noInternet" xml:space="preserve">
+    <value>No internet connection</value>
+  </data>
+  <data name="noRecipe" xml:space="preserve">
+    <value>No Recipe Found</value>
+  </data>
 </root>

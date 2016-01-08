@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Views;
+using NotificationsExtensions.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -12,6 +13,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
+using Windows.UI.Notifications;
 
 namespace BonApp.ViewModel
 {
@@ -92,11 +94,34 @@ namespace BonApp.ViewModel
         {
             Recipes.Clear();
             List<Recipe> listRecipes = await data.GetRecipeFavorite();
-
-            foreach (var item in listRecipes)
+            if (listRecipes.Count() == 0)
             {
-                Recipes.Add(item);
+                createToast("noRecipe");
             }
+            else { 
+                foreach (var item in listRecipes)
+                {
+                    Recipes.Add(item);
+                }
+            }
+        }
+
+        public void createToast(String value)
+        {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            ToastVisual visual = new ToastVisual()
+            {
+                TitleText = new ToastText()
+                {
+
+                    Text = loader.GetString(value)
+                },
+            };
+
+            ToastContent toastContent = new ToastContent();
+            toastContent.Visual = visual;
+            var toast = new ToastNotification(toastContent.GetXml());
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
     }
 

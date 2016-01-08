@@ -77,6 +77,10 @@ namespace BonApp.ViewModel
             {
                 createToast("recipeRemoved");
             }
+            else
+            {
+                createToast("noInternet");
+            }
         }
 
         public void createToast(String value)

@@ -25,17 +25,22 @@ namespace BonApp.Data
 
         public async Task<List<Recipe>> GetAllRecipes(String ingredients)
         {
-            client.BaseAddress = new Uri("http://food2fork.com/api/search?key=217401dcb0a4ad131cd118a528ce6cb4&q=" + ingredients);
-            HttpResponseMessage response = await client.GetAsync("");
-            string json = await response.Content.ReadAsStringAsync();
             var recipes = new List<Recipe>();
-            var f2fResponse = JsonConvert.DeserializeObject<F2fResponse>(json);
+            try { 
+                client.BaseAddress = new Uri("http://food2fork.com/api/search?key=217401dcb0a4ad131cd118a528ce6cb4&q=" + ingredients);
+                HttpResponseMessage response = await client.GetAsync("");
+                string json = await response.Content.ReadAsStringAsync();
+                var f2fResponse = JsonConvert.DeserializeObject<F2fResponse>(json);
 
-            if(f2fResponse.recipes.Any())
-            {
-                recipes = f2fResponse.recipes;
+                if(f2fResponse.recipes.Any())
+                {
+                    recipes = f2fResponse.recipes;
+                }
             }
-
+            catch (HttpRequestException e)
+            {
+                return recipes;
+            }
             return recipes;
 
         }

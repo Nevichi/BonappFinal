@@ -4,6 +4,7 @@ using GalaSoft.MvvmLight;
 using GalaSoft.MvvmLight.Command;
 using GalaSoft.MvvmLight.Ioc;
 using GalaSoft.MvvmLight.Views;
+using NotificationsExtensions.Toasts;
 using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
@@ -13,6 +14,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Input;
 using Windows.UI.Core;
+using Windows.UI.Notifications;
 using Windows.UI.Xaml.Navigation;
 
 namespace BonApp.ViewModel
@@ -109,13 +111,35 @@ namespace BonApp.ViewModel
             Recipes.Clear();
             data = new F2fDataAccess();
             List<Recipe> listRecipes = await data.GetAllRecipes(input);
-
-            foreach (var item in listRecipes)
-            {
-                Recipes.Add(item);
+            if (listRecipes.Count() == 0){
+                createToast("noRecipe");
+            }
+            else { 
+                foreach (var item in listRecipes)
+                {
+                    Recipes.Add(item);
+                }
+                listRecipes = null;
             }
             input = null;
-            listRecipes = null;
+        }
+
+        public void createToast(String value)
+        {
+            var loader = new Windows.ApplicationModel.Resources.ResourceLoader();
+            ToastVisual visual = new ToastVisual()
+            {
+                TitleText = new ToastText()
+                {
+
+                    Text = loader.GetString(value)
+                },
+            };
+
+            ToastContent toastContent = new ToastContent();
+            toastContent.Visual = visual;
+            var toast = new ToastNotification(toastContent.GetXml());
+            ToastNotificationManager.CreateToastNotifier().Show(toast);
         }
     }
 }
