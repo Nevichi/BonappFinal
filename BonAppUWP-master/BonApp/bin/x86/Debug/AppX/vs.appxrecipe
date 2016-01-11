@@ -22,13 +22,13 @@
     <AppXManifest Include="C:\Users\Quentin\Desktop\Cours 3eme\WPhone\BonApp-master\BonappFinal\BonAppUWP-master\BonApp\bin\x86\Debug\Core\AppxManifest.xml">
       <PackagePath>AppxManifest.xml</PackagePath>
       <ReRegisterAppIfChanged>true</ReRegisterAppIfChanged>
-      <Modified>2016-01-08T16:45:26.088</Modified>
+      <Modified>2016-01-11T18:10:08.514</Modified>
     </AppXManifest>
   </ItemGroup>
   <ItemGroup>
     <AppxPackagedFile Include="C:\Users\Quentin\Desktop\Cours 3eme\WPhone\BonApp-master\BonappFinal\BonAppUWP-master\BonApp\bin\x86\Debug\BonApp.exe">
       <PackagePath>entrypoint\BonApp.exe</PackagePath>
-      <Modified>2016-01-08T16:45:25.517</Modified>
+      <Modified>2016-01-11T13:16:52.681</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Quentin\.nuget\packages\CommonServiceLocator\1.3.0\lib\portable-net4+sl5+netcore45+wpa81+wp8\Microsoft.Practices.ServiceLocation.dll">
       <PackagePath>Microsoft.Practices.ServiceLocation.dll</PackagePath>
@@ -518,11 +518,11 @@
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Quentin\Desktop\Cours 3eme\WPhone\BonApp-master\BonappFinal\BonAppUWP-master\BonApp\bin\x86\Debug\resources.pri">
       <PackagePath>resources.pri</PackagePath>
-      <Modified>2016-01-08T16:26:28.537</Modified>
+      <Modified>2016-01-11T18:10:08.113</Modified>
     </AppxPackagedFile>
     <AppxPackagedFile Include="C:\Users\Quentin\Desktop\Cours 3eme\WPhone\BonApp-master\BonappFinal\BonAppUWP-master\BonApp\bin\x86\Debug\Core\BonApp.exe">
       <PackagePath>BonApp.exe</PackagePath>
-      <Modified>2016-01-08T16:45:26.085</Modified>
+      <Modified>2016-01-11T18:10:08.510</Modified>
     </AppxPackagedFile>
   </ItemGroup>
   <ItemGroup>

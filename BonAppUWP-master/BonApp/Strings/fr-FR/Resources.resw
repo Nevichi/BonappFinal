@@ -165,7 +165,7 @@
   <data name="passwordConfInput.Text" xml:space="preserve">
     <value>Confirmez votre mot de passe</value>
   </data>
-  <data name="subError" xml:space="preserve">
+  <data name="errorSub" xml:space="preserve">
     <value>L'utilisateur existe déjà</value>
   </data>
   <data name="subscribeTitle.Content" xml:space="preserve">
